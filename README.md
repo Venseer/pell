@@ -1,7 +1,7 @@
 <img src="./logo.png" width="256" alt="Logo">
 
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
-[![CDNJS](https://img.shields.io/cdnjs/v/pell.svg)](https://cdnjs.com/libraries/pell)
+[![npm](https://img.shields.io/npm/v/pell.svg)](https://www.npmjs.com/package/pell)
+[![cdnjs](https://img.shields.io/cdnjs/v/pell.svg)](https://cdnjs.com/libraries/pell)
 
 > pell is the simplest and smallest WYSIWYG text editor for web, with no dependencies
 
@@ -11,18 +11,19 @@ Live demo: [https://jaredreich.com/pell](https://jaredreich.com/pell)
 
 ## Comparisons
 
-| library       | size (min+gzip) | size (min) | jquery | bootstrap | link |
-|---------------|-----------------|------------|--------|-----------|------|
-| pell          | 1.39kB          | 3.48kB     |        |           | https://github.com/jaredreich/pell |
-| squire        | 16kB            | 49kB       |        |           | https://github.com/neilj/Squire |
-| medium-editor | 27kB            | 105kB      |        |           | https://github.com/yabwe/medium-editor |
-| quill         | 43kB            | 205kB      |        |           | https://github.com/quilljs/quill |
-| trix          | 47kB            | 204kB      |        |           | https://github.com/basecamp/trix |
-| ckeditor      | 163kB           | 551kB      |        |           | https://ckeditor.com |
-| trumbowyg     | 8kB             | 23kB       | x      |           | https://github.com/Alex-D/Trumbowyg |
-| summernote    | 26kB            | 93kB       | x      | x         | https://github.com/summernote/summernote |
-| froala        | 52kB            | 186kB      | x      |           | https://github.com/froala/wysiwyg-editor |
-| tinymce       | 157kB           | 491kB      | x      |           | https://github.com/tinymce/tinymce |
+| library       | size (min+gzip) | size (min) | jquery | bootstrap | react | link |
+|---------------|-----------------|------------|--------|-----------|-------|------|
+| pell          | 1.38kB          | 3.54kB     |        |           |       | https://github.com/jaredreich/pell |
+| squire        | 16kB            | 49kB       |        |           |       | https://github.com/neilj/Squire |
+| medium-editor | 27kB            | 105kB      |        |           |       | https://github.com/yabwe/medium-editor |
+| quill         | 43kB            | 205kB      |        |           |       | https://github.com/quilljs/quill |
+| trix          | 47kB            | 204kB      |        |           |       | https://github.com/basecamp/trix |
+| ckeditor      | 163kB           | 551kB      |        |           |       | https://ckeditor.com |
+| trumbowyg     | 8kB             | 23kB       | x      |           |       | https://github.com/Alex-D/Trumbowyg |
+| summernote    | 26kB            | 93kB       | x      | x         |       | https://github.com/summernote/summernote |
+| draft         | 46kB            | 147kB      |        |           | x     | https://github.com/facebook/draft-js |
+| froala        | 52kB            | 186kB      | x      |           |       | https://github.com/froala/wysiwyg-editor |
+| tinymce       | 157kB           | 491kB      | x      |           |       | https://github.com/tinymce/tinymce |
 
 ## Features
 
@@ -118,7 +119,7 @@ window.pell
 
 ```js
 // Initialize pell on an HTMLElement
-init({
+pell.init({
   // <HTMLElement>, required
   element: document.getElementById('some-id'),
 
@@ -146,7 +147,7 @@ init({
       name: 'custom',
       icon: 'C',
       title: 'Custom Action',
-      result: () => console.log('YOLO')
+      result: () => console.log('Do something!')
     },
     'underline'
   ],
@@ -188,18 +189,17 @@ pell.exec(command<string>, value<string>)
 ```html
 <div id="pell"></div>
 <div>
-  Text output:
-  <div id="text-output"></div>
   HTML output:
-  <pre id="html-output"></pre>
+  <div id="html-output" style="white-space:pre-wrap;"></div>
 </div>
 ```
 
 ```js
+import { exec, init } from 'pell'
+
 const editor = init({
   element: document.getElementById('pell'),
   onChange: html => {
-    document.getElementById('text-output').innerHTML = html
     document.getElementById('html-output').textContent = html
   },
   defaultParagraphSeparator: 'p',
@@ -221,14 +221,14 @@ const editor = init({
       name: 'image',
       result: () => {
         const url = window.prompt('Enter the image URL')
-        if (url) exec('insertImage', ensureHTTP(url))
+        if (url) exec('insertImage', url)
       }
     },
     {
       name: 'link',
       result: () => {
         const url = window.prompt('Enter the link URL')
-        if (url) exec('createLink', ensureHTTP(url))
+        if (url) exec('createLink', url)
       }
     }
   ],
@@ -243,6 +243,31 @@ const editor = init({
 // editor.content<HTMLElement>
 // To change the editor's content:
 editor.content.innerHTML = '<b><u><i>Initial content!</i></u></b>'
+```
+
+#### Example (Markdown)
+
+```html
+<div id="pell"></div>
+<div>
+  Markdown output:
+  <div id="markdown-output" style="white-space:pre-wrap;"></div>
+</div>
+```
+
+```js
+import { init } from 'pell'
+import Turndown from 'turndown'
+
+const { turndown } = new Turndown({ headingStyle: 'atx' })
+
+init({
+  element: document.getElementById('pell'),
+  actions: ['bold', 'italic', 'heading1', 'heading2', 'olist', 'ulist'],
+  onChange: html => {
+    document.getElementById('markdown-output').innerHTML = turndown(html)
+  }
+})
 ```
 
 ## Custom Styles
